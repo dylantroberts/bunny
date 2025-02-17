@@ -1,0 +1,165 @@
+[gd_scene load_steps=16 format=3 uid="uid://dlmre3ky6v383"]
+
+[ext_resource type="Script" path="res://scripts/playercontroller.gd" id="1_052x1"]
+[ext_resource type="Script" path="res://scripts/statemachinescripts/idle_player_state.gd" id="2_8k2v7"]
+[ext_resource type="Script" path="res://scripts/statemachinescripts/state_machine.gd" id="2_cxj7h"]
+[ext_resource type="Script" path="res://scripts/statemachinescripts/walking_player_state.gd" id="4_8uy6j"]
+[ext_resource type="Theme" uid="uid://lg46m8kues3m" path="res://themes/debug.tres" id="5_mux83"]
+[ext_resource type="Script" path="res://scripts/debug.gd" id="6_bptjp"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_5re47"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n4swm"]
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_bg3s4"]
+material = SubResource("StandardMaterial3D_n4swm")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jti2r"]
+albedo_color = Color(0, 1, 0, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wncar"]
+material = SubResource("StandardMaterial3D_jti2r")
+size = Vector3(1, 0.25, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vdwub"]
+size = Vector3(1, 0.25, 0.5)
+
+[sub_resource type="Animation" id="Animation_8alxp"]
+resource_name = "HardLand"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Head/Camera:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, -0.2, 0), Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = false
+tracks/1/path = NodePath("Head/Camera:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(-0.113586, 0, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_prfhj"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Head/Camera:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Head/Camera:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_01npf"]
+_data = {
+"HardLand": SubResource("Animation_8alxp"),
+"RESET": SubResource("Animation_prfhj")
+}
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_052x1")
+
+[node name="Hitbox" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_5re47")
+
+[node name="Body" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="Skin" type="MeshInstance3D" parent="Body"]
+mesh = SubResource("CapsuleMesh_bg3s4")
+
+[node name="Body2" type="Node3D" parent="."]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+
+[node name="Skin" type="MeshInstance3D" parent="Body2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.8, 0)
+mesh = SubResource("BoxMesh_wncar")
+
+[node name="Head" type="Node3D" parent="."]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.681808, 0)
+
+[node name="Camera" type="Camera3D" parent="Head"]
+unique_name_in_owner = true
+cull_mask = 1048573
+fov = 113.0
+
+[node name="PlayerStateMachine" type="Node" parent="." node_paths=PackedStringArray("CURRENT_STATE")]
+script = ExtResource("2_cxj7h")
+CURRENT_STATE = NodePath("IdlePlayerState")
+
+[node name="IdlePlayerState" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("2_8k2v7")
+
+[node name="WalkingPlayerState" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("4_8uy6j")
+
+[node name="UserInterface" type="Control" parent="."]
+layout_mode = 3
+anchor_left = 0.004
+anchor_top = 0.008
+anchor_right = 0.004
+anchor_bottom = 0.008
+offset_left = -5.608
+offset_top = -5.184
+offset_right = 0.392
+offset_bottom = -0.184002
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DebugPanel" type="PanelContainer" parent="UserInterface"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 210.0
+offset_bottom = 50.0
+theme = ExtResource("5_mux83")
+script = ExtResource("6_bptjp")
+
+[node name="MarginContainer" type="MarginContainer" parent="UserInterface/DebugPanel"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UserInterface/DebugPanel/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.9, 0)
+shape = SubResource("BoxShape3D_vdwub")
+
+[node name="HardLand" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_01npf")
+}
+speed_scale = 4.0

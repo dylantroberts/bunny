@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://0sfmd8mei3kr"]
+
+[node name="boost_pad" type="CSGBox3D"]
+transform = Transform3D(3.38292, 0, 0, 0, 1, 0, 0, 0, 3.01201, 2.48437, 0, 6.9134)
+use_collision = true
